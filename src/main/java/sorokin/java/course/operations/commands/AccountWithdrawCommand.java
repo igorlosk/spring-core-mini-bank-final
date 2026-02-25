@@ -19,10 +19,10 @@ public class AccountWithdrawCommand implements OperationCommand {
 
     @Override
     public void execute() {
-        int accountId = consoleInput.readPositiveInt("Enter account id:", "account id");
-        int amount = consoleInput.readPositiveInt("Enter amount:", "amount");
-        accountService.withdraw(accountId, amount);
-        System.out.println("Withdrawn " + amount + " from account " + accountId + ".");
+//        int accountId = consoleInput.readPositiveInt("Enter account id:", "account id");
+//        int amount = consoleInput.readPositiveInt("Enter amount:", "amount");
+//        accountService.withdraw(accountId, amount);
+//        System.out.println("Withdrawn " + amount + " from account " + accountId + ".");
     }
 
     @Override

@@ -23,11 +23,11 @@ public class AccountCreateCommand implements OperationCommand {
 
     @Override
     public void execute() {
-        int userId = consoleInput.readPositiveInt("Enter user id:", "user id");
-        var user = userService.findUserById(userId);
-        Account account = accountService.createAccount(user);
-        user.getAccountList().add(account);
-        System.out.println("Account created: " + account);
+//        int userId = consoleInput.readPositiveInt("Enter user id:", "user id");
+//        var user = userService.findUserById(userId);
+//        Account account = accountService.createAccount(user);
+//        user.getAccountList().add(account);
+//        System.out.println("Account created: " + account);
     }
 
     @Override

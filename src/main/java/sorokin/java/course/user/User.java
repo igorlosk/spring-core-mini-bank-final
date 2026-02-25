@@ -1,26 +1,50 @@
 package sorokin.java.course.user;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
 import sorokin.java.course.account.Account;
 
+@Entity
+@Table(name = "users")
 public class User {
-    private final int id;
-    private final String login;
-    private List<Account> accountList;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+    @Column(name = "login", unique = true)
+    private String login;
 
-    public User(int id, String login, List<Account> accountList) {
-        this.id = id;
+    @OneToMany()
+    @JoinColumn(name = "user_id")
+    private List<Account> accountList = new ArrayList<>();
+
+    public void addAccount(Account account) {
+        accountList.add(account);
+    }
+
+    public User() {
+    }
+
+    public User(String login) {
         this.login = login;
-        this.accountList = accountList;
     }
 
     public int getId() {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getLogin() {
         return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public List<Account> getAccountList() {
@@ -29,14 +53,5 @@ public class User {
 
     public void setAccountList(List<Account> accountList) {
         this.accountList = accountList;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", login='" + login + '\'' +
-                ", accountList=" + accountList +
-                '}';
     }
 }
