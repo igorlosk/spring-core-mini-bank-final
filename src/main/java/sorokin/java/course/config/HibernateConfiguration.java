@@ -27,5 +27,8 @@ public class HibernateConfiguration {
                 .setProperty("hibernate.show_sql", "true")
                 .setProperty("hibernate.hbm2ddl.auto", "update");
         return configuration.buildSessionFactory();
+
+
     }
+
 }

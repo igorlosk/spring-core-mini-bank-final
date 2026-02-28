@@ -16,7 +16,7 @@ public class User {
     @Column(name = "login", unique = true)
     private String login;
 
-    @OneToMany()
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private List<Account> accountList = new ArrayList<>();
 
@@ -53,5 +53,14 @@ public class User {
 
     public void setAccountList(List<Account> accountList) {
         this.accountList = accountList;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                ", accountList=" + accountList +
+                '}';
     }
 }

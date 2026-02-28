@@ -14,8 +14,6 @@ import java.util.Optional;
 @Component
 public class AccountService {
 
-//    private int idCounter;
-//    private final Map<Integer, Account> accountMap;
     private final AccountProperties accountProperties;
     private final SessionFactory sessionFactory;
     private final TransactionHelper transactionHelper;
@@ -25,6 +23,20 @@ public class AccountService {
         this.sessionFactory = sessionFactory;
         this.transactionHelper = transactionHelper;
     }
+
+    public Account createAccount(int userId) {
+        return transactionHelper.executeInTransaction(session -> {
+            User user = session.get(User.class, userId);
+            Account account = new Account(accountProperties.getDefaultAmount());
+            user.addAccount(account);
+            session.persist(account);
+            session.persist(user);
+            return account;
+        });
+    }
+}
+
+
 //
 //    public AccountService(AccountProperties accountProperties) {
 //        this.idCounter = 0;
@@ -32,21 +44,26 @@ public class AccountService {
 //        this.accountProperties = accountProperties;
 //    }
 //
-      public Account createAccount(User user) {
-        Account account = new Account(accountProperties.getDefaultAmount());
-        return account;
+//    public Account createAccount(User user) {
 //        return transactionHelper.executeInTransaction(session -> {
+//            Account account = new Account(accountProperties.getDefaultAmount());
+//            user.addAccount(account);
 //            session.persist(account);
+//            session.persist(user);
 //            return account;
 //        });
-      }
+//        return new Account(accountProperties.getDefaultAmount());
+
+/// /        return transactionHelper.executeInTransaction(session -> {
+/// /            session.persist(account);
+/// /            return account;
+/// /        });
+
 //    public Account createAccount(User user) {
 //        if (user == null) {
 //            throw new IllegalArgumentException("user must not be null");
 //        }
-//        idCounter++;
-//        Account newAccount = new Account(idCounter, user.getId(), accountProperties.getDefaultAmount());
-//        accountMap.put(idCounter, newAccount);
+//        Account newAccount = new Account(user.getId(), accountProperties.getDefaultAmount());
 //        return newAccount;
 //    }
 //
@@ -143,4 +160,4 @@ public class AccountService {
 //            throw new IllegalArgumentException("amount must be > 0");
 //        }
 //    }
-}
+

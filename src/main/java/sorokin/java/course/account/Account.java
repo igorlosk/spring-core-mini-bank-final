@@ -1,6 +1,7 @@
 package sorokin.java.course.account;
 
 import jakarta.persistence.*;
+import sorokin.java.course.user.User;
 
 @Entity
 @Table(name = "accounts")
@@ -11,10 +12,16 @@ public class Account {
     private int id;
     @Column(name = "money_amount")
     private int moneyAmount;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Account() {
     }
 
+    //    public Account(int moneyAmount) {
+//        this.moneyAmount = moneyAmount;
+//    }
     public Account(int moneyAmount) {
         this.moneyAmount = moneyAmount;
     }
@@ -36,6 +43,22 @@ public class Account {
 
     public int getMoneyAmount() {
         return moneyAmount;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "id=" + id +
+                ", moneyAmount=" + moneyAmount +
+                '}';
     }
 }
 

@@ -1,5 +1,6 @@
 package sorokin.java.course.operations.commands;
 
+import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
 import sorokin.java.course.account.Account;
 import sorokin.java.course.account.AccountService;
@@ -23,11 +24,12 @@ public class AccountCreateCommand implements OperationCommand {
 
     @Override
     public void execute() {
-//        int userId = consoleInput.readPositiveInt("Enter user id:", "user id");
-//        var user = userService.findUserById(userId);
+        int userId = consoleInput.readPositiveInt("Enter user id:", "user id");
+        var account = accountService.createAccount(userId);
+//        System.out.println(user);
 //        Account account = accountService.createAccount(user);
 //        user.getAccountList().add(account);
-//        System.out.println("Account created: " + account);
+        System.out.println("Account created: " + account);
     }
 
     @Override
