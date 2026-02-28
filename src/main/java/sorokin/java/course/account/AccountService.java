@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Component
 public class AccountService {
@@ -46,6 +47,43 @@ public class AccountService {
             session.persist(user);
         });
     }
+
+    public void closeAccount(int userId, int accountId) {
+        transactionHelper.executeInTransaction(session -> {
+            var user = session.find(User.class, userId);
+            List<Account> accountList = user.getAccountList();
+            Account accountFrom = accountList.stream().filter(account -> account.getId() == accountId).findFirst().get();
+            Account accountTo = accountList.stream().filter(account -> account.getId() != accountId).findFirst().get();
+            int moneyAmount = accountFrom.getMoneyAmount();
+            session.remove(accountFrom);
+            accountTo.setMoneyAmount(moneyAmount + accountTo.getMoneyAmount());
+            session.persist(accountTo);
+            session.persist(user);
+
+        });
+    }
+
+//    public Account closeAccount(Integer accountId) {
+//        validatePositiveId(accountId, "account id");
+//        Account accountToClose = findAccountById(accountId)
+//                .orElseThrow(() -> new IllegalArgumentException("No such account: id=%s".formatted(accountId)));
+//        var userId = accountToClose.getUserId();
+//        var userAccounts = getUserAccounts(userId);
+//        if (userAccounts.size() == 1) {
+//            throw new IllegalStateException("Can't close the only one account");
+//        }
+//        accountMap.remove(accountId);
+//
+//        var accountToTransferMoney = userAccounts.stream()
+//                .filter(it -> it.getId() != accountId)
+//                .findFirst()
+//                .orElseThrow();
+//
+//        var newAmount = accountToTransferMoney.getMoneyAmount() + accountToClose.getMoneyAmount();
+//        accountToTransferMoney.setMoneyAmount(newAmount);
+//        return accountToClose;
+//    }
+
 
     //    public void deposit(Integer toAccountId, Integer amount) {
 
