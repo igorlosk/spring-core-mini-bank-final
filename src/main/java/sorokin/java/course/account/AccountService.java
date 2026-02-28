@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import sorokin.java.course.TransactionHelper;
 import sorokin.java.course.account.Account;
 import sorokin.java.course.user.User;
+import sorokin.java.course.user.UserService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,18 +16,19 @@ import java.util.Optional;
 public class AccountService {
 
     private final AccountProperties accountProperties;
-    private final SessionFactory sessionFactory;
     private final TransactionHelper transactionHelper;
 
-    public AccountService(AccountProperties accountProperties, SessionFactory sessionFactory, TransactionHelper transactionHelper) {
+    public AccountService(
+            AccountProperties accountProperties,
+            TransactionHelper transactionHelper
+    ) {
         this.accountProperties = accountProperties;
-        this.sessionFactory = sessionFactory;
         this.transactionHelper = transactionHelper;
     }
 
     public Account createAccount(int userId) {
         return transactionHelper.executeInTransaction(session -> {
-            User user = session.get(User.class, userId);
+            User user = session.find(User.class, userId);
             Account account = new Account(accountProperties.getDefaultAmount());
             user.addAccount(account);
             session.persist(account);
@@ -34,6 +36,37 @@ public class AccountService {
             return account;
         });
     }
+
+    public void deposit(int userId, int amount) {
+        transactionHelper.executeInTransaction(session -> {
+            var user = session.find(User.class, userId);
+            Account account = user.getAccountList().getFirst();
+            account.setMoneyAmount(account.getMoneyAmount() + amount);
+            session.persist(account);
+            session.persist(user);
+        });
+    }
+
+    //    public void deposit(Integer toAccountId, Integer amount) {
+
+//        Account account = findAccountById(toAccountId)
+//                .orElseThrow(() -> new IllegalArgumentException("No such account: id=%s".formatted(toAccountId)));
+//
+//        account.setMoneyAmount(account.getMoneyAmount() + amount);
+//    }
+
+//    private void validatePositiveId(Integer id, String fieldName) {
+//        if (id == null || id <= 0) {
+//            throw new IllegalArgumentException(fieldName + " must be > 0");
+//        }
+//    }
+//
+//    private void validatePositiveAmount(Integer amount) {
+//        if (amount == null || amount <= 0) {
+//            throw new IllegalArgumentException("amount must be > 0");
+//        }
+//    }
+
 }
 
 
