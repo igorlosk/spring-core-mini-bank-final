@@ -59,6 +59,33 @@ public class AccountService {
         });
     }
 
+    public void withdraw(int userId, int accountId, int amount) {
+        if (userId <= 0 || accountId <= 0) {
+            throw new IllegalArgumentException("Invalid user ID or account ID");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Withdrawal amount must be positive: " + amount);
+        }
+        transactionHelper.executeInTransaction(session -> {
+            var user = session.find(User.class, userId);
+            if (user == null) {
+                throw new EntityNotFoundException("User not found with ID: " + userId);
+            }
+            List<Account> accountList = user.getAccountList();
+            Account accountFrom = accountList.stream()
+                    .filter(account -> account.getId() == accountId)
+                    .findFirst()
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Account not found with ID: " + accountId));
+            int currentBalance = accountFrom.getMoneyAmount();
+            if (currentBalance < amount) {
+                throw new IllegalArgumentException(
+                        "Insufficient funds. Balance: " + currentBalance + ", requested: " + amount);
+            }
+            accountFrom.setMoneyAmount(currentBalance - amount);
+        });
+    }
+
     public void closeAccount(int userId, int accountId) {
         if (userId <= 0 || accountId <= 0) {
             throw new IllegalArgumentException("Invalid user ID or account ID");
