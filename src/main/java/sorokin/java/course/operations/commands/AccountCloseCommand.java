@@ -25,8 +25,6 @@ public class AccountCloseCommand implements OperationCommand {
         int userId = consoleInput.readPositiveInt("Enter user id:", "user id");
         int accountId = consoleInput.readPositiveInt("Enter account id to close:", "account id");
         accountService.closeAccount(userId, accountId);
-//        var user = userService.findUserById(closedAccount.getUserId());
-//        user.getAccountList().remove(closedAccount);
         System.out.println("Account " + accountId + " closed.");
     }
 

@@ -12,16 +12,13 @@ public class Account {
     private int id;
     @Column(name = "money_amount")
     private int moneyAmount;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private User user;
 
     public Account() {
     }
 
-    //    public Account(int moneyAmount) {
-//        this.moneyAmount = moneyAmount;
-//    }
     public Account(int moneyAmount) {
         this.moneyAmount = moneyAmount;
     }

@@ -16,7 +16,7 @@ public class User {
     @Column(name = "login", unique = true)
     private String login;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id")
     private List<Account> accountList = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 package sorokin.java.course.account;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
 import sorokin.java.course.TransactionHelper;
@@ -28,38 +29,68 @@ public class AccountService {
     }
 
     public Account createAccount(int userId) {
+        if (userId <= 0) {
+            throw new IllegalArgumentException("Invalid user ID: " + userId);
+        }
         return transactionHelper.executeInTransaction(session -> {
             User user = session.find(User.class, userId);
+            if (user == null) {
+                throw new EntityNotFoundException("User not found with ID: " + userId);
+            }
             Account account = new Account(accountProperties.getDefaultAmount());
             user.addAccount(account);
             session.persist(account);
-            session.persist(user);
             return account;
         });
     }
 
     public void deposit(int userId, int amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be positive: " + amount);
+        }
         transactionHelper.executeInTransaction(session -> {
             var user = session.find(User.class, userId);
+            if (user == null) {
+                throw new EntityNotFoundException("User not found with ID: " + userId);
+            }
             Account account = user.getAccountList().getFirst();
             account.setMoneyAmount(account.getMoneyAmount() + amount);
             session.persist(account);
-            session.persist(user);
         });
     }
 
     public void closeAccount(int userId, int accountId) {
+        if (userId <= 0 || accountId <= 0) {
+            throw new IllegalArgumentException("Invalid user ID or account ID");
+        }
         transactionHelper.executeInTransaction(session -> {
             var user = session.find(User.class, userId);
+            if (user == null) {
+                throw new EntityNotFoundException("User not found with ID: " + userId);
+            }
             List<Account> accountList = user.getAccountList();
-            Account accountFrom = accountList.stream().filter(account -> account.getId() == accountId).findFirst().get();
-            Account accountTo = accountList.stream().filter(account -> account.getId() != accountId).findFirst().get();
-            int moneyAmount = accountFrom.getMoneyAmount();
-            session.remove(accountFrom);
-            accountTo.setMoneyAmount(moneyAmount + accountTo.getMoneyAmount());
-            session.persist(accountTo);
-            session.persist(user);
 
+            if (accountList.size() == 1) {
+                throw new IllegalArgumentException("Cannot close the only account of a user");
+            }
+
+            Account accountFrom = accountList.stream()
+                    .filter(account -> account.getId() == accountId)
+                    .findFirst()
+                    .orElseThrow(() -> new EntityNotFoundException(
+                            "Account not found with ID: " + accountId));
+
+            int moneyAmount = accountFrom.getMoneyAmount();
+
+            accountList.remove(accountFrom);
+            session.remove(accountFrom);
+
+            accountList = user.getAccountList();
+            Account accountTo = accountList.getFirst();
+
+            int newBalance = accountTo.getMoneyAmount() + moneyAmount;
+            accountTo.setMoneyAmount(newBalance);
+            session.persist(user);
         });
     }
 

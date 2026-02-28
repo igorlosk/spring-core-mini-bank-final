@@ -14,9 +14,6 @@ import java.util.*;
 @Component
 public class UserService {
 
-    //    private int idCounter;
-//    private final Map<Integer, User> userMap;
-//    private final Set<String> takenLogins;
     private final AccountService accountService;
     private final SessionFactory sessionFactory;
     private final TransactionHelper transactionHelper;
@@ -27,32 +24,24 @@ public class UserService {
             AccountService accountService,
             SessionFactory sessionFactory,
             TransactionHelper transactionHelper,
-            AccountProperties accountProperties)
-    {
+            AccountProperties accountProperties) {
         this.accountService = accountService;
         this.sessionFactory = sessionFactory;
         this.transactionHelper = transactionHelper;
         this.accountProperties = accountProperties;
     }
 
-    //
-//    public UserService(AccountService accountService) {
-//        this.idCounter = 0;
-//        this.userMap = new HashMap<>();
-//        this.takenLogins = new HashSet<>();
-//        this.accountService = accountService;
-//    }
     public User createUser(String login) {
         var user = new User(login);
         return transactionHelper.executeInTransaction(session -> {
             Account account = new Account(accountProperties.getDefaultAmount());
             user.addAccount(account);
-            session.persist(account);
             session.persist(user);
             return user;
         });
     }
-//
+
+    //
 //    public User createUser(String login) {
 //        String normalizedLogin = validateLogin(login);
 //        if (takenLogins.contains(normalizedLogin)) {
