@@ -46,9 +46,7 @@ public class AccountService {
     }
 
     public void withdraw(int userId, int accountId, int amount) {
-        if (userId <= 0 || accountId <= 0) {
-            throw new IllegalArgumentException("Invalid user ID or account ID");
-        }
+        userIdAccountIdValidate(userId, accountId);
         validatePositiveAmount(amount);
         transactionHelper.executeInTransaction(session -> {
             var user = session.find(User.class, userId);
@@ -68,10 +66,10 @@ public class AccountService {
         });
     }
 
+
+
     public void closeAccount(int userId, int accountId) {
-        if (userId <= 0 || accountId <= 0) {
-            throw new IllegalArgumentException("Invalid user ID or account ID");
-        }
+        userIdAccountIdValidate(userId, accountId);
         transactionHelper.executeInTransaction(session -> {
             var user = session.find(User.class, userId);
             userExistValidate(userId, user);
@@ -105,21 +103,29 @@ public class AccountService {
         validatePositiveId(fromAccountId, "source account id");
         validatePositiveId(toAccountId, "target account id");
         validatePositiveAmount(amount);
-        if (fromAccountId == toAccountId) {
-            throw new IllegalArgumentException("source and target account id must be different");
-        }
 
         transactionHelper.executeInTransaction(session -> {
             Account fromAccount = session.find(Account.class, fromAccountId);
             Account toAccount = session.find(Account.class, toAccountId);
+
+            if(fromAccount.getId() == toAccount.getId()) {
+                throw new IllegalArgumentException("Transfers from the same account number are prohibited");
+            }
+
+            if (fromAccount.getMoneyAmount() < amount) {
+                throw new IllegalArgumentException("Not enough money to the transfer");
+            }
+
             if (fromAccount.getUser().getId() == toAccount.getUser().getId()) {
                 toAccount.setMoneyAmount(toAccount.getMoneyAmount() + amount);
                 fromAccount.setMoneyAmount(fromAccount.getMoneyAmount() - amount);
             }
+            if (fromAccount.getUser().getId() != toAccount.getUser().getId()) {
+                int transferWithCommission = Math.toIntExact(Math.round(amount * (1 - accountProperties.getTransferCommission())));
+                toAccount.setMoneyAmount(toAccount.getMoneyAmount() + transferWithCommission);
+                fromAccount.setMoneyAmount(fromAccount.getMoneyAmount() - amount);
+            }
 
-            int transferWithCommission = Math.toIntExact(Math.round(amount * (1 - accountProperties.getTransferCommission())));
-            toAccount.setMoneyAmount(transferWithCommission);
-            fromAccount.setMoneyAmount(fromAccount.getMoneyAmount() - amount);
         });
     }
 
@@ -145,6 +151,12 @@ public class AccountService {
     private static void userExistValidate(int userId, User user) {
         if (user == null) {
             throw new EntityNotFoundException("User not found with ID: " + userId);
+        }
+    }
+
+    private static void userIdAccountIdValidate(int userId, int accountId) {
+        if (userId <= 0 || accountId <= 0) {
+            throw new IllegalArgumentException("Invalid user ID or account ID");
         }
     }
 

@@ -55,28 +55,4 @@ public class TransactionHelper {
         }
     }
 
-    public <T> T executeInTransactionOrJoin(Supplier<T> action) {
-        Session session = sessionFactory.getCurrentSession();
-        Transaction tx = session.getTransaction();
-        boolean owner = tx.getStatus() == TransactionStatus.NOT_ACTIVE;
-        if (owner) {
-            tx = session.beginTransaction();
-        }
-        try {
-            T result = action.get();
-            if (owner) {
-                tx.commit();
-            }
-            return result;
-        } catch (RuntimeException e) {
-            if (owner) {
-                tx.rollback();
-            }
-            throw e;
-        } finally {
-            if (owner) {
-                session.close();
-            }
-        }
-    }
 }
