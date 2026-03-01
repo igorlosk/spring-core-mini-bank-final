@@ -1,5 +1,6 @@
 package sorokin.java.course.console;
 
+import org.hibernate.cfg.RecoverableException;
 import org.springframework.stereotype.Component;
 import sorokin.java.course.operations.ConsoleOperationType;
 import sorokin.java.course.operations.OperationCommand;
@@ -53,11 +54,13 @@ public class OperationsConsoleListener {
             String message = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
             System.out.println("Error: " + message);
         }
+
     }
 
     private void init() {
         System.out.println("MiniBank started. Type EXIT to stop.");
         consoleInput.printAvailableCommands();
     }
+
 
 }
