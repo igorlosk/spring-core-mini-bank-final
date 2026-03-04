@@ -1,7 +1,6 @@
 package sorokin.java.course.operations.commands;
 
 import org.springframework.stereotype.Component;
-import sorokin.java.course.account.Account;
 import sorokin.java.course.account.AccountService;
 import sorokin.java.course.console.ConsoleInput;
 import sorokin.java.course.operations.ConsoleOperationType;
@@ -24,9 +23,7 @@ public class AccountCreateCommand implements OperationCommand {
     @Override
     public void execute() {
         int userId = consoleInput.readPositiveInt("Enter user id:", "user id");
-        var user = userService.findUserById(userId);
-        Account account = accountService.createAccount(user);
-        user.getAccountList().add(account);
+        var account = accountService.createAccount(userId);
         System.out.println("Account created: " + account);
     }
 

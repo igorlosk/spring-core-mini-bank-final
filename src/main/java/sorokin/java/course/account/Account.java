@@ -1,27 +1,26 @@
 package sorokin.java.course.account;
 
+import jakarta.persistence.*;
+import sorokin.java.course.user.User;
+
+@Entity
+@Table(name = "accounts")
 public class Account {
-
-    private final int id;
-    private final int userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+    @Column(name = "money_amount")
     private int moneyAmount;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public Account(int id, int userId, int moneyAmount) {
-        this.id = id;
-        this.userId = userId;
+    public Account() {
+    }
+
+    public Account(int moneyAmount) {
         this.moneyAmount = moneyAmount;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public int getMoneyAmount() {
-        return moneyAmount;
     }
 
     public void setMoneyAmount(int moneyAmount) {
@@ -31,12 +30,32 @@ public class Account {
         this.moneyAmount = moneyAmount;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getMoneyAmount() {
+        return moneyAmount;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Account{" +
                 "id=" + id +
-                ", userId=" + userId +
                 ", moneyAmount=" + moneyAmount +
                 '}';
     }
 }
+
