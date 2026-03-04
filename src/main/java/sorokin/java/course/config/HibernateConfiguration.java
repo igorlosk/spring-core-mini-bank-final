@@ -21,7 +21,7 @@ public class HibernateConfiguration {
                 .addAnnotatedClass(Account.class)
                 .addPackage("com.project")
                 .setProperty("hibernate.connection.driver_class", "org.postgresql.Driver")
-                .setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/postgres")
+                .setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5431/postgres")
                 .setProperty("hibernate.connection.username", "postgres")
                 .setProperty("hibernate.connection.password", "root")
                 .setProperty("hibernate.show_sql", "true")
